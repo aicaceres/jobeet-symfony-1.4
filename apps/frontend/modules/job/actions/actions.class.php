@@ -38,7 +38,10 @@ class jobActions extends sfActions
 
   public function executeEdit(sfWebRequest $request)
   {
-    $this->form = new JobeetJobForm($this->getRoute()->getObject());
+    $job = $this->getRoute()->getObject();
+    $this->forward404If($job->getIsActivated());
+
+    $this->form = new JobeetJobForm($job);
   }
 
   public function executeUpdate(sfWebRequest $request)
@@ -94,5 +97,13 @@ class jobActions extends sfActions
     $this->getUser()->setFlash('notice', sprintf('Your job validity has been extended until %s.', $job->getDateTimeObject('expires_at')->format('m/d/Y')));
 
     $this->redirect($this->generateUrl('job_show_user', $job));
+  }
+
+  public function executeSearch(sfWebRequest $request)
+  {
+    $this->forwardUnless($query = $request->getParameter('query'), 'job', 'index');
+
+    $this->jobs = Doctrine_Core::getTable('JobeetJob')
+      ->getForLuceneQuery($query);
   }
 }
