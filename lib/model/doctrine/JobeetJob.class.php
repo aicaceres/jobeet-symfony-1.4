@@ -72,9 +72,10 @@ class JobeetJob extends BaseJobeetJob
     return ceil(($this->getDateTimeObject('expires_at')->format('U') - time()) / 86400);
   }
 
-  public function extend()
+  public function extend($force = false)
   {
-    if (!$this->expiresSoon()) {
+    if (!$force && !$this->expiresSoon())
+    {
       return false;
     }
 
